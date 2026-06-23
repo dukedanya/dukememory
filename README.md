@@ -1,51 +1,66 @@
 # dukememory
 
-Project-scoped memory, retrieval, and code-context infrastructure for Codex and
-local AI agents.
+![dukememory banner](docs/assets/dukememory-banner.svg)
 
-Dukememory is a local-first agent memory engine. It stores durable project
-knowledge in PostgreSQL, keeps every lookup isolated by project, indexes source
-code for task-aware context, and exposes the whole system through CLI commands
-and MCP tools with the `dukememory_*` prefix.
+[![CI](https://github.com/dukedanya/dukememory/actions/workflows/ci.yml/badge.svg)](https://github.com/dukedanya/dukememory/actions/workflows/ci.yml)
+[![Rust](https://img.shields.io/badge/Rust-2024-000000?logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![MCP](https://img.shields.io/badge/MCP-dukememory__*-2563EB)](#mcp-contract)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL%20%2B-pgvector-336791?logo=postgresql&logoColor=white)](#local-postgresql)
+[![Ollama](https://img.shields.io/badge/Ollama-local%20models-10B981)](#embeddings)
+[![Status](https://img.shields.io/badge/status-early%20local--first-F59E0B)](#status)
 
-It is designed for a single developer workstation where agents need useful
-memory without leaking facts between repositories, blindly trusting automatic
-extraction, or shipping prompts to a hosted memory service.
+**Project-scoped memory, retrieval, and code-context infrastructure for Codex
+and local AI agents.**
 
-## What It Does
+Dukememory is a local-first memory engine for agents that need durable project
+knowledge without cross-repository leakage, blind automatic writes, or a hosted
+memory service. It stores memories in PostgreSQL, retrieves with keyword +
+semantic signals, indexes source code, and exposes everything through CLI and
+MCP tools prefixed with `dukememory_*`.
 
-- Stores project memories with explicit lifecycle states: `pending`, `active`,
-  `superseded`, and `archived`.
-- Keeps retrieval project-scoped by default across keyword search, semantic
-  search, hybrid search, code index lookup, and graph operations.
-- Uses local PostgreSQL plus `pgvector` for durable storage and vector search.
-- Uses local Ollama models for embeddings, memory extraction, validation, and
-  optional reranking.
-- Builds task-scoped context bundles that combine selected memories, compact
-  graph facts, indexed code symbols, code memories, and retrieval diagnostics.
-- Indexes code symbols and approximate call relationships across Rust, Python,
-  JavaScript/TypeScript, Go, Java, Kotlin, and Swift.
-- Separates automatic extraction from trust: agent-written candidates normally
-  start as `pending` and must be reviewed before default retrieval uses them.
-- Blocks obvious secrets before writing new memories.
-- Preserves memory provenance through episodes, audit logs, eval runs, and
-  temporal graph facts.
-- Provides a native memory/code graph viewer for browsing project vaults.
-- Includes smoke tests, production rollout audits, Codex integration audits, and
-  retrieval eval suites.
+## Why Dukememory
 
-## Core Components
+Agents become much more useful when they can remember decisions, architecture
+constraints, task outcomes, and code facts. They also become risky when memory is
+global, unreviewed, or impossible to audit. Dukememory is built around a stricter
+contract:
 
-| Area | Purpose |
+- every lookup is scoped to the current project;
+- automatic writes start as reviewable `pending` candidates;
+- active memory is append-friendly and history-preserving;
+- obvious secrets are blocked before storage;
+- retrieval context is selected for the current task, not dumped wholesale;
+- code and memory are connected through indexed symbols, graph facts, and audit
+  events.
+
+## Highlights
+
+| Capability | What it gives an agent |
 | --- | --- |
-| Memory store | Project profiles, memory rows, lifecycle, deduplication, audit events, backups, export/import |
-| Retrieval | PostgreSQL full-text search, Ollama embeddings, hybrid Reciprocal Rank Fusion, optional reranking |
-| Context packing | Prompt-ready task context with selected memories, fragments, graph summaries, and code hits |
-| Memory graph | Entities, facts, edges, episodes, temporal invalidation, and graph extraction |
-| Code index | Multi-language symbol index, code search, outlines, approximate caller/callee/impact navigation |
-| MCP server | Agent-facing `dukememory_*` tools, resources, and prompts over stdio or localhost HTTP |
-| Codex integration | Config generation, Stop/PreCompact extraction hooks, audit commands, and hook smoke tests |
-| GUI | Native project vault browser with memory, code, relationship, overview, cluster, and file views |
+| Project-isolated memory | Decisions, rules, setup notes, and summaries never leak across repos by default |
+| Hybrid retrieval | PostgreSQL full-text search plus local Ollama embeddings with Reciprocal Rank Fusion |
+| Reviewed lifecycle | `pending`, `active`, `superseded`, and `archived` states instead of silent overwrites |
+| Task context packs | Prompt-ready bundles with selected memories, fragments, graph facts, and code hits |
+| Code graph index | Symbol search, outlines, approximate callers/callees, impact analysis, and code memories |
+| Memory graph | Entities, facts, edges, provenance episodes, and temporal invalidation |
+| Codex integration | MCP config generation, Stop/PreCompact extraction hooks, smoke tests, and audits |
+| Native viewer | Local memory/code graph browser with project vaults, clusters, files, and bridge views |
+
+## Contents
+
+- [Quick Start](#quick-start)
+- [Architecture At A Glance](#architecture-at-a-glance)
+- [Agent Workflow](#agent-workflow)
+- [Requirements](#requirements)
+- [Documentation Map](#documentation-map)
+- [Status](#status)
+- [Local PostgreSQL](#local-postgresql)
+- [Store And Search](#store-and-search)
+- [MCP Contract](#mcp-contract)
+- [Codex Integration](#codex-integration)
+- [Backup And Portability](#backup-and-portability)
+- [Embeddings](#embeddings)
+- [Graph And Health](#graph-and-health)
 
 ## Quick Start
 
@@ -79,6 +94,48 @@ Run the native viewer:
 ```bash
 cargo run -- dukememory_app
 ```
+
+## Architecture At A Glance
+
+```text
+Codex / local agent
+        |
+        | MCP tools and CLI commands
+        v
+dukememory
+  |-- project resolver and safety policy
+  |-- memory lifecycle and review queue
+  |-- context planner and retrieval packer
+  |-- code index and code-memory links
+  |-- memory graph and temporal facts
+        |
+        v
+PostgreSQL + pgvector       Ollama
+durable rows, FTS, vectors  embeddings, extraction, reranking
+```
+
+| Area | Purpose |
+| --- | --- |
+| Memory store | Project profiles, memory rows, lifecycle, deduplication, audit events, backups, export/import |
+| Retrieval | PostgreSQL full-text search, Ollama embeddings, hybrid Reciprocal Rank Fusion, optional reranking |
+| Context packing | Prompt-ready task context with selected memories, fragments, graph summaries, and code hits |
+| Memory graph | Entities, facts, edges, episodes, temporal invalidation, and graph extraction |
+| Code index | Multi-language symbol index, code search, outlines, approximate caller/callee/impact navigation |
+| MCP server | Agent-facing `dukememory_*` tools, resources, and prompts over stdio or localhost HTTP |
+| Codex integration | Config generation, Stop/PreCompact extraction hooks, audit commands, and hook smoke tests |
+| GUI | Native project vault browser with memory, code, relationship, overview, cluster, and file views |
+
+## Agent Workflow
+
+1. Call `dukememory_prepare` or `dukememory_agent_before` with the active
+   `project_path`.
+2. Use the returned task-scoped memory fragments, graph hints, code hits, and
+   code-neighborhood metadata while editing.
+3. Store automatic observations as `pending` candidates through
+   `dukememory_extract` or `dukememory_agent_after`.
+4. Review candidates with `dukememory_review` and promote only trusted memories.
+5. Use `dukememory_trace`, `dukememory_feedback`, and eval suites to turn bad
+   retrievals into auditable regression cases.
 
 ## Requirements
 
