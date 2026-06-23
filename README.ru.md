@@ -10,18 +10,16 @@
 [![PostgreSQL + pgvector](https://img.shields.io/badge/PostgreSQL%20%2B-pgvector-336791?logo=postgresql&logoColor=white)](#быстрый-старт)
 [![Ollama](https://img.shields.io/badge/Ollama-local%20AI%20models-10B981)](#требования)
 
-**Локальная память для AI-агентов, MCP-сервер, семантический поиск и code graph
-context для Codex и developer agents.**
+**Приватная по умолчанию память для AI coding agents: проектный recall,
+semantic retrieval и code context поверх PostgreSQL, pgvector, Ollama и MCP.**
 
-Dukememory дает локальным AI-агентам для программирования проектную долговременную
-память. Система хранит решения, архитектурные правила, результаты задач, факты о
-коде и feedback retrieval-качества в PostgreSQL + pgvector; использует Ollama для
-локальных embeddings и extraction; индексирует исходный код; и открывает все
-возможности через CLI и MCP-инструменты с префиксом `dukememory_*`.
+Dukememory - это local-first memory layer для Codex и developer agents. Система
+превращает решения, архитектурные правила, результаты задач, факты о коде и
+retrieval feedback в reviewable project memory, а затем отдает компактный
+task context через CLI и MCP-инструменты с префиксом `dukememory_*`.
 
-Проект создан для разработчиков, которым нужна persistent agent memory без
-облачного хранилища, утечек между репозиториями и автоматических записей без
-review.
+Проект создан для разработчиков, которым нужна persistent AI agent memory:
+локальная, аудируемая, изолированная по проектам и связанная с кодовой базой.
 
 ## Зачем Это Нужно
 
@@ -101,12 +99,19 @@ agents. Основные семейства инструментов:
 | Memory writes | `dukememory_remember`, `dukememory_extract`, `dukememory_agent_after` |
 | Review lifecycle | `dukememory_review`, `dukememory_promote`, `dukememory_supersede`, `dukememory_archive` |
 | Code intelligence | `dukememory_code_search`, `dukememory_code_explore`, `dukememory_read_symbol`, `dukememory_impact` |
+| Development quality | `dukememory_devsystem` |
 | Graph и semantic ops | `dukememory_graph`, `dukememory_graph_extract`, `dukememory_trace`, `dukememory_feedback` |
 | Operations | `dukememory_status`, `dukememory_health`, `dukememory_backup`, `dukememory_export`, `dukememory_import` |
 
 Для нетривиальных agent tasks начинайте с `dukememory_prepare` и передавайте
 `project_path`. Инструмент обновляет code index и возвращает компактный
 task-scoped context bundle, а не выгружает всю проектную память в prompt.
+
+`dukememory_devsystem` запускает MCP-facing advisory quality loop. Structured
+response включает стабильный contract block `dukedevsystem.report.v1`,
+capabilities, self-validation status, role/stage reports, File Entropy Score,
+boundary repair plans, advisory quality gates, optional quality evidence и
+pending-only memory write candidates.
 
 ## Архитектура
 
