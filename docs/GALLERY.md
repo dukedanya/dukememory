@@ -10,10 +10,12 @@ Visual assets for the GitHub repository and documentation.
 
 Use this image as the GitHub social preview artwork:
 
-![dukememory social preview](assets/social-preview.svg)
+![dukememory social preview](assets/social-preview.png)
 
 GitHub repository settings currently require uploading social preview artwork
-through the web UI. The prepared image lives at `docs/assets/social-preview.svg`.
+through the web UI. The prepared upload image lives at
+`docs/assets/social-preview.png`; the editable SVG source lives at
+`docs/assets/social-preview.svg`.
 
 ## Native Viewer Preview
 
