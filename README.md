@@ -2,6 +2,8 @@
 
 ![dukememory banner](docs/assets/dukememory-banner.svg)
 
+[English](README.md) | [Русский](README.ru.md)
+
 [![CI](https://github.com/dukedanya/dukememory/actions/workflows/ci.yml/badge.svg)](https://github.com/dukedanya/dukememory/actions/workflows/ci.yml)
 [![Rust](https://img.shields.io/badge/Rust-2024-000000?logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![MCP Server](https://img.shields.io/badge/MCP-server-2563EB)](#mcp-server-for-ai-agents)
