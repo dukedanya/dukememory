@@ -5,6 +5,8 @@
 [English](README.md) | [Русский](README.ru.md)
 
 [![CI](https://github.com/dukedanya/dukememory/actions/workflows/ci.yml/badge.svg)](https://github.com/dukedanya/dukememory/actions/workflows/ci.yml)
+[![License: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/dukedanya/dukememory?include_prereleases&sort=semver)](https://github.com/dukedanya/dukememory/releases)
 [![Rust](https://img.shields.io/badge/Rust-2024-000000?logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![MCP Server](https://img.shields.io/badge/MCP-server-2563EB)](#mcp-server-for-ai-agents)
 [![PostgreSQL + pgvector](https://img.shields.io/badge/PostgreSQL%20%2B-pgvector-336791?logo=postgresql&logoColor=white)](#quick-start)

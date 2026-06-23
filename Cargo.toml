@@ -3,6 +3,7 @@ name = "dukememory"
 version = "0.1.0"
 edition = "2024"
 description = "Project-scoped memory engine, retrieval layer, and code graph toolkit for Codex and local agents"
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/dukedanya/dukememory"
 readme = "README.md"
 keywords = ["agents", "memory", "mcp", "retrieval", "codex"]
