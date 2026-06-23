@@ -1,0 +1,144 @@
+{
+  "name": "dukememory-core",
+  "cases": [
+    {
+      "name": "project prefix query",
+      "query": "prefix",
+      "expected_contains": ["dukememory_*"],
+      "forbidden_contains": ["secret_password"],
+      "min_results": 1,
+      "max_latency_ms": 1000,
+      "max_estimated_tokens": 100
+    },
+    {
+      "name": "project isolation query",
+      "query": "mandatory filter memory lookup",
+      "expected_contains": ["project_id as a mandatory filter"],
+      "forbidden_contains": ["secret_password"],
+      "min_results": 1,
+      "max_latency_ms": 1000,
+      "max_estimated_tokens": 100
+    },
+    {
+      "name": "code graph navigation query",
+      "query": "code graph prepare impact search",
+      "expected_contains": ["project-scoped code graph first"],
+      "forbidden_contains": ["secret_password"],
+      "min_results": 1,
+      "max_latency_ms": 1000,
+      "max_estimated_tokens": 200
+    },
+    {
+      "name": "fragment first task scoped retrieval",
+      "query": "context retrieval strictly task scoped",
+      "expected_contains": ["strictly task-scoped"],
+      "forbidden_contains": ["secret_password"],
+      "expected_ids": ["019ef250-095b-7b00-b8d0-3f0b1ef4ef1e"],
+      "min_results": 1,
+      "max_latency_ms": 1000,
+      "max_estimated_tokens": 250
+    },
+    {
+      "name": "negative search check",
+      "query": "nonexistent_secret_keyword",
+      "expected_contains": [],
+      "forbidden_contains": ["dukememory_*", "project_id"],
+      "min_results": 0,
+      "max_latency_ms": 1000,
+      "max_estimated_tokens": 0
+    },
+    {
+      "name": "code target finds eval runner",
+      "target": "code",
+      "query": "run eval suite",
+      "expected_contains": ["run_eval_suite"],
+      "forbidden_contains": ["secret_password"],
+      "min_results": 1,
+      "max_latency_ms": 2000,
+      "max_estimated_tokens": 90000
+    },
+    {
+      "name": "code target finds embedding cache",
+      "target": "code",
+      "query": "set_code_symbol_embedding_with_cache attach_cached_code_symbol_embedding",
+      "expected_contains": ["set_code_symbol_embedding_with_cache", "attach_cached_code_symbol_embedding"],
+      "forbidden_contains": ["secret_password"],
+      "min_results": 1,
+      "max_latency_ms": 2000,
+      "max_estimated_tokens": 45000
+    },
+    {
+      "name": "context target combines memory and code",
+      "target": "context",
+      "query": "code graph prepare impact search",
+      "expected_contains": ["project-scoped code graph first"],
+      "forbidden_contains": ["secret_password"],
+      "min_results": 1,
+      "max_latency_ms": 3000,
+      "max_estimated_tokens": 85000
+    },
+    {
+      "name": "semantic context policy returns learned recommendation",
+      "target": "semantic",
+      "semantic_action": "context_policy",
+      "query": "implement code graph memory feature",
+      "expected_contains": ["recommended_policy", "baseline_plan", "quality_probe"],
+      "forbidden_contains": ["secret_password"],
+      "min_results": 1,
+      "max_latency_ms": 3000,
+      "max_estimated_tokens": 12000
+    },
+    {
+      "name": "semantic counterfactual emits eval case",
+      "target": "semantic",
+      "semantic_action": "counterfactual_eval",
+      "query": "dukememory context retrieval",
+      "expected_contains": ["leave_one_out", "suggested_eval_case", "hard_negatives"],
+      "forbidden_contains": ["secret_password"],
+      "min_results": 1,
+      "max_latency_ms": 3000,
+      "max_estimated_tokens": 14000
+    },
+    {
+      "name": "semantic temporal context reads as of graph",
+      "target": "semantic",
+      "semantic_action": "temporal_context",
+      "query": "dukememory",
+      "as_of": "2026-06-23 00:00:00+03",
+      "expected_contains": ["temporal_model", "graph_rule", "memory_rule"],
+      "forbidden_contains": ["secret_password"],
+      "min_results": 1,
+      "max_latency_ms": 3000,
+      "max_estimated_tokens": 20000
+    },
+    {
+      "name": "semantic trace returns replay envelope",
+      "target": "semantic",
+      "semantic_action": "trace",
+      "query": "implement code graph memory feature",
+      "expected_contains": ["replay", "deterministic_inputs", "retrieval_events"],
+      "forbidden_contains": ["secret_password"],
+      "min_results": 0,
+      "max_latency_ms": 1000,
+      "max_estimated_tokens": 4000
+    },
+    {
+      "name": "review apply dry run target",
+      "target": "review_apply",
+      "query": "dry run review decision",
+      "decisions": [
+        {
+          "id": "eval-dry-run-sentinel",
+          "action": "keep",
+          "reason": "eval dry run"
+        }
+      ],
+      "expected_contains": ["eval-dry-run-sentinel", "dry_run"],
+      "forbidden_contains": ["secret_password"],
+      "expected_ids": ["eval-dry-run-sentinel"],
+      "min_results": 1,
+      "max_latency_ms": 1000,
+      "max_estimated_tokens": 100
+    }
+  ]
+}

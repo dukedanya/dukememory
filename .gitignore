@@ -1,0 +1,21 @@
+/target/
+
+# Local runtime/configuration
+.env
+.env.*
+!.env.example
+*.log
+*.tmp
+
+# OS/editor noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local database/export artifacts
+*.pgdump
+*.sqlite
+*.sqlite3
+*.db

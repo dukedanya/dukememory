@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.dukememory.tailscale-ollama-forwarder</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/path/to/node</string>
+    <string>/path/to/dukememory/scripts/tailscale-ollama-forwarder.mjs</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>LISTEN_HOST</key>
+    <string>127.0.0.1</string>
+    <key>LISTEN_PORT</key>
+    <string>11435</string>
+    <key>TS_TARGET_HOST</key>
+    <string>your-tailscale-host</string>
+    <key>TS_TARGET_PORT</key>
+    <string>11434</string>
+    <key>TAILSCALE_BIN</key>
+    <string>/opt/homebrew/bin/tailscale</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/tailscale-ollama-forwarder.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/tailscale-ollama-forwarder.err.log</string>
+</dict>
+</plist>
