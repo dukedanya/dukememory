@@ -451,6 +451,11 @@ For a full agent loop, call `dukememory_agent_before` before the task and `dukem
 Backend agent-intelligence tools:
 
 - `dukememory_context_policy` learns a recommended memory/code/graph/token policy from retrieval events, feedback, and a live quality probe.
+- `dukememory_self_heal` runs the autonomous backend memory self-healing loop over lifecycle review, outcome learning, conflict graph analysis, memory compilation, and audit.
+- `dukememory_outcome_learn` turns completed or failed task sessions into helpful/unhelpful memory quality signals.
+- `dukememory_conflict_graph` finds contradictory memories and graph facts; with `apply=true`, it invalidates weaker temporal graph facts.
+- `dukememory_memory_compiler` promotes stable high-confidence rules to `core`, archives low-signal duplicates, and creates pending split candidates for long memories.
+- `dukememory_policy_ab` compares live retrieval policies and records the recommended memory/code/mode policy.
 - `dukememory_trace` and `dukememory_task_replay` build a flight-recorder view from a task session id, retrieval event id, or query. `dukememory_agent_task` links retrieval events to its task session so replay can inspect the exact context used by that run.
 - `dukememory_counterfactual_eval` runs leave-one-out retrieval counterfactuals and returns hard-negative eval signals.
 - `dukememory_code_causality` and `dukememory_memory_impact` connect selected memories to code symbols, code relations, impacted files, and affected tests.

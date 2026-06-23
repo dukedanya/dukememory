@@ -77,6 +77,8 @@ Keyword search remains available so the system keeps working when Ollama is unav
 
 Retrieval events are audit records, not prompt context. `dukememory_agent_task` attaches retrieval events to its `task_session_id`, and `dukememory_trace` / `dukememory_task_replay` can replay those exact events before falling back to query-based lookup for older data. `dukememory_feedback` accepts a retrieval event id plus typed outcome/severity, updates retrieved memory quality and contradiction-risk signals, writes an audit event, and stores a regression eval case.
 
+The autonomous self-healing loop is backend-only and audit-first. `dukememory_self_heal` composes lifecycle review, outcome learning, conflict graph analysis, and memory compilation. `dukememory_outcome_learn` converts completed/failed task-session outcomes into helpful/unhelpful memory quality signals. `dukememory_conflict_graph` finds contradictory memories and graph facts, and with `apply=true` invalidates only weaker temporal facts. `dukememory_memory_compiler` promotes stable high-confidence rules to `core`, archives low-signal duplicates, and writes pending split candidates for overlong memories. `dukememory_policy_ab` runs live retrieval policy trials and records the recommended policy. These tools default to dry-run planning; `apply=true` performs auditable mutations.
+
 ## Memory Graph
 
 The graph layer is project-scoped and uses:
