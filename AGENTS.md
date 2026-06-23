@@ -92,6 +92,11 @@ Use:
 - `dukememory_topic_map`
 - `dukememory_budget_optimize`
 - `dukememory_feedback`
+- `dukememory_self_heal`
+- `dukememory_outcome_learn`
+- `dukememory_conflict_graph`
+- `dukememory_memory_compiler`
+- `dukememory_policy_ab`
 - `dukememory_context_policy`
 - `dukememory_trace`
 - `dukememory_task_replay`

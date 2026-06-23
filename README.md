@@ -374,6 +374,11 @@ Current tools:
 - `dukememory_topic_map`
 - `dukememory_budget_optimize`
 - `dukememory_feedback`
+- `dukememory_self_heal`
+- `dukememory_outcome_learn`
+- `dukememory_conflict_graph`
+- `dukememory_memory_compiler`
+- `dukememory_policy_ab`
 - `dukememory_context_policy`
 - `dukememory_trace`
 - `dukememory_task_replay`
@@ -441,7 +446,7 @@ For agent startup, prefer `dukememory_prepare`: it incrementally indexes the sel
 
 For a full agent loop, call `dukememory_agent_before` before the task and `dukememory_agent_after` after the task. They are MCP aliases for the tested prepare/extract workflow and keep all writes project-scoped.
 
-`dukememory_devsystem` runs the `dukedevsystem` MCP advisory orchestrator for a task and touched files. It creates a task session, auto-indexes the project by default when `project_path` is supplied, emits a readiness-percent stage timeline for Planner, Memory, Architect, Coder, Test, Critic, Refactor, and final Memory, computes File Entropy Score reports, includes code-review-plan telemetry, recommends affected tests and executable fallback commands, reports stale or missing code-index/git/coverage signals, emits structured boundary repair plans for high-entropy files, and returns advisory quality gates with a gate summary. By default it writes typed pending memory candidates: task intent, decision memory, per-file entropy observations, and an intent-graph candidate memory; `memory_writes` groups ids by category and includes structured graph candidates sourced to pending memory ids. MCP parameters include `auto_index`, `full_rebuild`, `embed_symbols`, and `embed_symbol_limit`; the structured report includes `telemetry.index_run` plus `telemetry.index_guard`. It supports an optional MCP `policy` object plus `[devsystem]` settings in `.dukememory.toml` for entropy thresholds, ignored/generated/static file patterns, required test commands, coverage threshold, and responsibility keywords. The key rule is: file size is a signal, not a verdict; responsibility density is the verdict.
+`dukememory_devsystem` runs the `dukedevsystem` MCP advisory orchestrator for a task and touched files. It creates a task session, auto-indexes the project by default when `project_path` is supplied, emits a readiness-percent stage timeline for Planner, Memory, Architect, Coder, Test, Critic, Refactor, and final Memory, computes File Entropy Score reports, includes code-review-plan telemetry, recommends affected tests and executable fallback commands, reports stale or missing code-index/git/coverage signals, emits structured boundary repair plans for high-entropy files, and returns advisory quality gates with a gate summary. Optional `run_evidence=true` executes exact allowed recommended commands without a shell and records `quality_evidence_reports` with status, exit code, duration, and stdout/stderr excerpts; failed evidence becomes a blocker, timeout/skipped evidence needs human decision, and the default remains advisory `not_run`. By default it writes typed pending memory candidates: task intent, decision memory, per-file entropy observations, and an intent-graph candidate memory; `memory_writes` groups ids by category and includes structured graph candidates sourced to pending memory ids. MCP parameters include `auto_index`, `full_rebuild`, `embed_symbols`, `embed_symbol_limit`, `run_evidence`, `evidence_timeout_seconds`, `max_evidence_commands`, and `allowed_evidence_commands`; the structured report includes `telemetry.index_run` plus `telemetry.index_guard`. It supports an optional MCP `policy` object plus `[devsystem]` settings in `.dukememory.toml` for entropy thresholds, ignored/generated/static file patterns, required test commands, coverage threshold, and responsibility keywords. The key rule is: file size is a signal, not a verdict; responsibility density is the verdict.
 
 Backend agent-intelligence tools:
 

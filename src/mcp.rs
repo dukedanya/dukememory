@@ -8859,6 +8859,197 @@ mod tests {
     }
 
     #[tokio::test(flavor = "multi_thread")]
+    async fn memory_compiler_apply_promotes_stable_rule_to_core() -> Result<()> {
+        let config = test_config("memory-compiler-apply");
+        let store = Store::open(&config.database_marker)?;
+        let memory_id = store.remember(
+            "mcp-test",
+            NewMemory {
+                scope: DEFAULT_MEMORY_SCOPE.to_string(),
+                memory_tier: DEFAULT_MEMORY_TIER.to_string(),
+                kind: "project_rule".to_string(),
+                body: "Project rule: task replay must use session-linked retrieval events."
+                    .to_string(),
+                tags: vec!["task-replay".to_string()],
+                source: Some("test".to_string()),
+                status: MemoryStatus::Active,
+                importance: 0.9,
+                confidence: 0.92,
+                status_reason: None,
+                allow_sensitive: false,
+            },
+        )?;
+        drop(store);
+
+        let response = handle_message(
+            &config,
+            json!({
+                "jsonrpc": "2.0",
+                "id": 177,
+                "method": "tools/call",
+                "params": {
+                    "name": "dukememory_memory_compiler",
+                    "arguments": {
+                        "project_id": "mcp-test",
+                        "limit": 20,
+                        "apply": true
+                    }
+                }
+            }),
+        )
+        .await
+        .expect("memory compiler returns response");
+        assert!(response.get("error").is_none(), "{response}");
+        assert_eq!(
+            response["result"]["structuredContent"]["counts"]["promote_to_core"],
+            1
+        );
+
+        let store = Store::open(&config.database_marker)?;
+        let memory = store.get("mcp-test", &memory_id)?.expect("memory exists");
+        assert_eq!(memory.memory_tier, "core");
+        Ok(())
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn conflict_graph_apply_invalidates_weaker_fact() -> Result<()> {
+        let config = test_config("conflict-graph-apply");
+        let store = Store::open(&config.database_marker)?;
+        let entity = store.upsert_memory_entity(
+            "mcp-test",
+            "module",
+            "retrieval",
+            Vec::new(),
+            Some("Retrieval subsystem".to_string()),
+        )?;
+        let weaker = store.add_memory_fact(
+            "mcp-test",
+            Some(&entity.id),
+            None,
+            "uses",
+            "global memory lookup",
+            0.45,
+        )?;
+        let stronger = store.add_memory_fact(
+            "mcp-test",
+            Some(&entity.id),
+            None,
+            "uses",
+            "project scoped memory lookup",
+            0.92,
+        )?;
+        drop(store);
+
+        let response = handle_message(
+            &config,
+            json!({
+                "jsonrpc": "2.0",
+                "id": 178,
+                "method": "tools/call",
+                "params": {
+                    "name": "dukememory_conflict_graph",
+                    "arguments": {
+                        "project_id": "mcp-test",
+                        "query": "retrieval",
+                        "limit": 20,
+                        "apply": true
+                    }
+                }
+            }),
+        )
+        .await
+        .expect("conflict graph returns response");
+        assert!(response.get("error").is_none(), "{response}");
+        assert_eq!(
+            response["result"]["structuredContent"]["counts"]["invalidated_facts"],
+            1
+        );
+
+        let store = Store::open(&config.database_marker)?;
+        let graph = store.search_memory_graph("mcp-test", "", 20)?;
+        assert!(graph.facts.iter().any(|fact| fact.id == stronger.id));
+        assert!(!graph.facts.iter().any(|fact| fact.id == weaker.id));
+        Ok(())
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn outcome_learn_apply_uses_completed_session_memory_ids() -> Result<()> {
+        let config = test_config("outcome-learn-apply");
+        let store = Store::open(&config.database_marker)?;
+        let memory_id = store.remember(
+            "mcp-test",
+            NewMemory {
+                scope: DEFAULT_MEMORY_SCOPE.to_string(),
+                memory_tier: DEFAULT_MEMORY_TIER.to_string(),
+                kind: "decision".to_string(),
+                body: "Task sessions should retain retrieved memory ids for outcome learning."
+                    .to_string(),
+                tags: vec!["task-session".to_string()],
+                source: Some("test".to_string()),
+                status: MemoryStatus::Active,
+                importance: 0.7,
+                confidence: 0.75,
+                status_reason: None,
+                allow_sensitive: false,
+            },
+        )?;
+        let before = store.get("mcp-test", &memory_id)?.expect("memory exists");
+        let session = store.create_task_session(NewTaskSession {
+            project_id: "mcp-test",
+            query: "task session outcome learning",
+            status: "completed",
+            phase: "done",
+            progress: 100,
+            result: json!({"tests_passed": true, "accepted": true}),
+        })?;
+        store.update_task_session(
+            "mcp-test",
+            &session.id,
+            TaskSessionUpdate {
+                status: None,
+                phase: None,
+                progress: None,
+                memory_ids: Some(vec![memory_id.clone()]),
+                code_symbol_ids: None,
+                file_paths: None,
+                test_paths: None,
+                summary: Some(Some("completed".to_string())),
+                result: None,
+            },
+        )?;
+        drop(store);
+
+        let response = handle_message(
+            &config,
+            json!({
+                "jsonrpc": "2.0",
+                "id": 179,
+                "method": "tools/call",
+                "params": {
+                    "name": "dukememory_outcome_learn",
+                    "arguments": {
+                        "project_id": "mcp-test",
+                        "id": session.id,
+                        "apply": true
+                    }
+                }
+            }),
+        )
+        .await
+        .expect("outcome learn returns response");
+        assert!(response.get("error").is_none(), "{response}");
+        assert_eq!(
+            response["result"]["structuredContent"]["counts"]["helpful_ids"],
+            1
+        );
+
+        let store = Store::open(&config.database_marker)?;
+        let after = store.get("mcp-test", &memory_id)?.expect("memory exists");
+        assert!(after.quality_score > before.quality_score);
+        Ok(())
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
     async fn context_tool_filters_unrelated_core_rules_by_task_query() {
         let config = test_config("context-core-query-filter");
         let store = Store::open(&config.database_marker).expect("store opens");

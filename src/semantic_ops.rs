@@ -1035,7 +1035,17 @@ fn semantic_outcome_learn(store: &Store, request: &SemanticOperationRequest) -> 
 fn semantic_conflict_graph(store: &Store, request: &SemanticOperationRequest) -> Result<Value> {
     let query = request.query.as_deref().unwrap_or("");
     let memory_conflicts = memory_conflict_candidates(store, request)?;
-    let graph = store.search_memory_graph(&request.project_id, query, request.limit.max(50))?;
+    let mut graph = store.search_memory_graph(&request.project_id, query, request.limit.max(50))?;
+    if !query.trim().is_empty() {
+        let all_graph =
+            store.search_memory_graph(&request.project_id, "", request.limit.max(50))?;
+        graph.facts.extend(all_graph.facts);
+        graph.facts.sort_by(|left, right| left.id.cmp(&right.id));
+        graph.facts.dedup_by(|left, right| left.id == right.id);
+        graph.edges.extend(all_graph.edges);
+        graph.edges.sort_by(|left, right| left.id.cmp(&right.id));
+        graph.edges.dedup_by(|left, right| left.id == right.id);
+    }
     let mut fact_conflicts = fact_conflict_candidates(&graph.facts);
     fact_conflicts.truncate(request.limit.clamp(1, 100));
     let mut invalidated = Vec::new();
@@ -2675,6 +2685,9 @@ fn normalized_fact_value(value: &str) -> String {
 }
 
 fn should_compile_to_core(memory: &Memory) -> bool {
+    let effective_quality = memory
+        .quality_score
+        .max((memory.importance * 0.55) + (memory.confidence * 0.35));
     memory.status == "active"
         && memory.memory_tier != "core"
         && matches!(
@@ -2683,7 +2696,7 @@ fn should_compile_to_core(memory: &Memory) -> bool {
         )
         && memory.importance >= 0.75
         && memory.confidence >= 0.75
-        && memory.quality_score >= 0.60
+        && effective_quality >= 0.60
         && memory.contradiction_risk <= 0.35
 }
 

@@ -3890,7 +3890,7 @@ def legacy_migration_compat(row): return backfill(row)
                 run_evidence: false,
                 evidence_timeout_seconds: 120,
                 max_evidence_commands: 5,
-                allowed_evidence_commands: vec!["/bin/echo evidence-ok".to_string()],
+                allowed_evidence_commands: Vec::new(),
                 code_embedding_model: None,
                 duplicate_similarity: 0.92,
                 review_limit: 50,
@@ -3976,7 +3976,7 @@ def legacy_migration_compat(row): return backfill(row)
                 run_evidence: false,
                 evidence_timeout_seconds: 120,
                 max_evidence_commands: 5,
-                allowed_evidence_commands: vec!["/usr/bin/false".to_string()],
+                allowed_evidence_commands: Vec::new(),
                 code_embedding_model: None,
                 duplicate_similarity: 0.92,
                 review_limit: 50,
@@ -4037,7 +4037,7 @@ def generate_invoice(payment): return str(payment)
                 run_evidence: false,
                 evidence_timeout_seconds: 120,
                 max_evidence_commands: 5,
-                allowed_evidence_commands: vec!["/bin/sleep 2".to_string()],
+                allowed_evidence_commands: Vec::new(),
                 code_embedding_model: None,
                 duplicate_similarity: 0.92,
                 review_limit: 50,
@@ -4133,7 +4133,7 @@ def send_email_notification(email): print(email)
                 run_evidence: false,
                 evidence_timeout_seconds: 120,
                 max_evidence_commands: 5,
-                allowed_evidence_commands: vec!["/bin/echo ok; /bin/echo no".to_string()],
+                allowed_evidence_commands: Vec::new(),
                 code_embedding_model: None,
                 duplicate_similarity: 0.92,
                 review_limit: 50,
@@ -4426,7 +4426,7 @@ def send_email_notification(email): print(email)
                 run_evidence: true,
                 evidence_timeout_seconds: 120,
                 max_evidence_commands: 5,
-                allowed_evidence_commands: Vec::new(),
+                allowed_evidence_commands: vec!["/bin/echo evidence-ok".to_string()],
                 code_embedding_model: None,
                 duplicate_similarity: 0.92,
                 review_limit: 50,
@@ -4446,7 +4446,10 @@ def send_email_notification(email): print(email)
             report
                 .quality_gates
                 .iter()
-                .any(|gate| gate.id == "quality_evidence" && gate.status == "pass")
+                .any(|gate| gate.id == "quality_evidence" && gate.status == "pass"),
+            "gates={:#?} evidence={:#?}",
+            report.quality_gates,
+            report.quality_evidence_reports
         );
         let decision = store
             .get(
@@ -4498,7 +4501,7 @@ def send_email_notification(email): print(email)
                 run_evidence: true,
                 evidence_timeout_seconds: 120,
                 max_evidence_commands: 5,
-                allowed_evidence_commands: Vec::new(),
+                allowed_evidence_commands: vec!["/usr/bin/false".to_string()],
                 code_embedding_model: None,
                 duplicate_similarity: 0.92,
                 review_limit: 50,
@@ -4561,7 +4564,7 @@ def send_email_notification(email): print(email)
                 run_evidence: true,
                 evidence_timeout_seconds: 1,
                 max_evidence_commands: 5,
-                allowed_evidence_commands: Vec::new(),
+                allowed_evidence_commands: vec!["/bin/sleep 2".to_string()],
                 code_embedding_model: None,
                 duplicate_similarity: 0.92,
                 review_limit: 50,
@@ -4612,7 +4615,7 @@ def send_email_notification(email): print(email)
                 run_evidence: true,
                 evidence_timeout_seconds: 120,
                 max_evidence_commands: 5,
-                allowed_evidence_commands: Vec::new(),
+                allowed_evidence_commands: vec!["/bin/echo ok; /bin/echo no".to_string()],
                 code_embedding_model: None,
                 duplicate_similarity: 0.92,
                 review_limit: 50,

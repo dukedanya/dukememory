@@ -104,7 +104,7 @@ CLI commands `graph-entity`, `graph-fact`, `graph-edge`, and `graph-search` rema
 
 `doctor --deep` includes a built-in isolated eval readiness check. File-based retrieval suites can be run with `eval --file`; each run stores suite name, suite hash, mode, per-case details, and optional comparison data against the previous run of the same suite/mode/hash. Eval cases may target `memory`, `code`, `context`, `semantic`, or dry-run `review_apply`, so retrieval regressions can cover memory lookup, code search, combined context assembly, agent-intelligence operations, and review-decision wiring.
 
-`dukememory_devsystem` is the MCP-facing `dukedevsystem` quality loop. It auto-indexes the project by default when `project_path` is supplied, supports `auto_index`, `full_rebuild`, `embed_symbols`, and `embed_symbol_limit`, and returns both `telemetry.index_run` and `telemetry.index_guard`. It returns structured readiness progress, stage reports for the advisory agent roles, File Entropy Score reports, code-review-plan telemetry, test commands, missing telemetry signals, effective policy, structured boundary repair plans, advisory quality gates, gate summary, and typed pending memory write ids. The Memory Agent writes deduplicated pending task-intent, decision, per-file entropy, and intent-graph candidate memories when `write_memory=true`; `write_memory=false` leaves `memory_writes.status=disabled` and writes nothing. Intent graph links are represented as pending memory candidates with source memory ids, not automatically promoted graph edges. Policy comes from defaults, optional `[devsystem]` values in `.dukememory.toml`, and optional per-call MCP `policy` overrides. It is advisory and does not auto-apply boundary repairs.
+`dukememory_devsystem` is the MCP-facing `dukedevsystem` quality loop. It auto-indexes the project by default when `project_path` is supplied, supports `auto_index`, `full_rebuild`, `embed_symbols`, and `embed_symbol_limit`, and returns both `telemetry.index_run` and `telemetry.index_guard`. It returns structured readiness progress, stage reports for the advisory agent roles, File Entropy Score reports, code-review-plan telemetry, test commands, missing telemetry signals, effective policy, structured boundary repair plans, advisory quality gates, gate summary, optional `quality_evidence_reports`, and typed pending memory write ids. Evidence execution is opt-in with `run_evidence=true`; commands are parsed into argv and run without a shell, can be narrowed with exact `allowed_evidence_commands`, respect `evidence_timeout_seconds` and `max_evidence_commands`, and store only bounded stdout/stderr excerpts. The Memory Agent writes deduplicated pending task-intent, decision, per-file entropy, and intent-graph candidate memories when `write_memory=true`; `write_memory=false` leaves `memory_writes.status=disabled` and writes nothing. Executed evidence is summarized in pending decision memory and intent-graph candidates. Intent graph links are represented as pending memory candidates with source memory ids, not automatically promoted graph edges. Policy comes from defaults, optional `[devsystem]` values in `.dukememory.toml`, and optional per-call MCP `policy` overrides. It is advisory and does not auto-apply boundary repairs.
 
 Current tools:
 
@@ -157,6 +157,36 @@ Current tools:
 - `dukememory_find_callers`
 - `dukememory_find_callees`
 - `dukememory_impact`
+- `dukememory_semantic`
+- `dukememory_dedupe`
+- `dukememory_related`
+- `dukememory_semantic_review`
+- `dukememory_semantic_route`
+- `dukememory_semantic_clusters`
+- `dukememory_semantic_tags`
+- `dukememory_stale_check`
+- `dukememory_consistency_check`
+- `dukememory_eval_generate`
+- `dukememory_hard_negatives`
+- `dukememory_embedding_health`
+- `dukememory_model_migration`
+- `dukememory_isolation_check`
+- `dukememory_memory_hints`
+- `dukememory_policy_decision`
+- `dukememory_retrieval_quality`
+- `dukememory_auto_eval`
+- `dukememory_ab_compare`
+- `dukememory_lifecycle_review`
+- `dukememory_code_memory_suggest`
+- `dukememory_verify_conflicts`
+- `dukememory_topic_map`
+- `dukememory_budget_optimize`
+- `dukememory_feedback`
+- `dukememory_self_heal`
+- `dukememory_outcome_learn`
+- `dukememory_conflict_graph`
+- `dukememory_memory_compiler`
+- `dukememory_policy_ab`
 - `dukememory_context_policy`
 - `dukememory_trace`
 - `dukememory_task_replay`
